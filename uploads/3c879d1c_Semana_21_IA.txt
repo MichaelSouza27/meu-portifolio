@@ -1,0 +1,67 @@
+Parte 1 — O sistema sem orquestração (o problema)
+1.1
+ 
+O sistema não lembra o que o usuário disse nas mensagens anteriores:
+Componente: Memória. Serve para guardar o histórico da conversa e fazer o sistema lembrar do que foi dito antes.
+
+Precisa de múltiplos agentes? Não. Um único agente já consegue usar a memória para não esquecer o contexto.
+
+Adicionar novas funcionalidades exige alterar o código central, com risco de erro:
+
+Componente: Ferramentas. Em vez de encher o código de if e else, a gente cria funções separadas com a descrição do que cada uma faz, e o agente só chama quando precisa.
+
+Precisa de múltiplos agentes? Não. Dá para colocar todas as ferramentas em um agente só. Ter vários agentes só compensa se o sistema for muito grande.
+
+ 
+O sistema não combina ações (executa apenas a primeira condição encontrada):
+Componente: Executor. Ele faz o agente pensar no pedido, usar uma ferramenta, analisar o resultado e, se ainda faltar alguma coisa, usar outra ferramenta antes de responder.
+
+Precisa de múltiplos agentes? Não. O próprio executor de um agente só consegue rodar mais de uma ação na mesma resposta.
+
+ 
+Não há registro das ações executadas:
+Componente: Callbacks ou logs de execução. É a parte do framework que anota tudo o que aconteceu (o que a pessoa digitou, qual ferramenta rodou e se deu algum erro).
+
+Precisa de múltiplos agentes? Não. Essa parte de registro roda direto no framework, mesmo com um único agente.
+
+1.2
+O problema é que o código atual só procura a palavra exata "nota fiscal". Se a pessoa escreve "preciso da minha fatura do mês passado", o programa não encontra essa palavra exata, pula todas as condições e cai direto na mensagem de erro dizendo que não entendeu. O sistema acaba falhando porque não reconhece sinônimos nem o contexto do que o usuário está pedindo.
+
+Parte 2 — Modelando com framework e múltiplos agentes
+2.1 Estrutura do SupportFlow:
+Agente: Agente de Login e Acesso
+
+Responsabilidade: Ajudar o usuário com problemas de senha, recuperação de conta e login.
+
+Ferramentas que utiliza: enviar link de recuperação.
+
+Agente: Agente Financeiro
+
+Responsabilidade: Resolver dúvidas sobre faturamento, encontrar notas fiscais e checar pagamentos.
+
+Ferramentas que utiliza: extrair CPF, buscar nota fiscal.
+
+Agente: Agente de Planos e Cancelamento
+
+Responsabilidade: Mostrar as opções de planos disponíveis e ajudar o cliente caso ele queira mudar ou cancelar a assinatura.
+
+Ferramentas que utiliza: listar planos disponíveis, iniciar cancelamento.
+
+Agente orquestrador:
+
+Função: É o agente principal. Ele recebe a mensagem do usuário, entende o que ele precisa e repassa o pedido para o agente especialista certo. Depois que o especialista resolve, o orquestrador monta a resposta final e manda para o cliente.
+
+2.2 Como o sistema decide qual agente deve atuar:
+1- O usuário envia uma mensagem, e o sistema junta ela com o histórico salvo na memória.
+
+2- O agente orquestrador lê a mensagem e usa inteligência artificial para entender a intenção da pessoa, comparando com o papel de cada agente.
+
+3- Se o usuário estiver com dúvida de pagamento, ele passa para o Financeiro; se quiser ver preços ou cancelar, passa para o de Planos.
+
+4- O agente especialista assume, usa as ferramentas necessárias para buscar a informação e devolve o resultado para o orquestrador.
+
+5- O orquestrador organiza a resposta e envia para o usuário de forma clara.
+
+ 
+2.3 Por que o framework resolve o problema da questão 1.2:
+Porque o orquestrador entende o sentido da frase, em vez de apenas buscar palavras idênticas. Quando a pessoa escreve "preciso da minha fatura do mês passado", o modelo sabe que a palavra fatura tem o mesmo sentido de cobrança e nota fiscal. Com isso, ele não trava na palavra que o cliente usou e já encaminha o pedido direto para o Agente Financeiro resolver.

@@ -1,0 +1,46 @@
+Identificação dos componentes da arquitetura
+Interface do aluno: É a tela do chat onde o aluno conversa com o assistente, envia dúvidas e recebe as respostas.
+
+Agente orquestrador: É o agente principal que analisa a mensagem, entende o que o aluno precisa e passa a tarefa para o especialista certo.
+
+Agente de dúvidas: Especialista em explicar conteúdos, conceitos das aulas e tirar dúvidas da matéria.
+
+Agente de exercícios: Especialista que busca ou cria questões, confere as respostas do aluno e explica onde ele errou.
+
+Agente de recomendação: Especialista que sugere quais aulas, tópicos ou revisões o aluno deve fazer a seguir.
+
+Memória: Guarda o que foi falado na conversa atual e os dados do perfil do aluno ao longo do tempo (longo prazo).
+
+Recuperação de conhecimento: Sistema de busca que pesquisa trechos das apostilas e materiais oficiais da EstudaMais para embasar as respostas.
+
+Ferramentas externas: Conexões que os agentes usam para consultar outros sistemas, como o progresso do aluno e o catálogo de cursos.
+
+Fluxo da arquitetura do sistema
+
+image.png
+
+ 
+O caminho da mensagem, as trocas e o retorno
+Por onde passa: Tudo começa quando o aluno digita a dúvida no chat (1). A mensagem cai direto no Agente Orquestrador, que funciona como o cérebro do sistema. Ele dá uma olhada rápida na Memória (4) para ver quem é o aluno e o que já foi falado antes. Sabendo do que se trata, ele aciona o especialista certo (2), que no caso de matéria é o Agente de dúvidas. No fim, a resposta pronta é entregue de volta na tela do aluno (7).
+
+Quem troca informação com quem: O Orquestrador passa a tarefa para o especialista (2) e o especialista devolve a resposta elaborada (3). Enquanto isso, o sistema pesquisa no RAG (5) para pegar as informações oficiais das apostilas e, se precisasse consultar faltas, notas ou o catálogo de cursos, consultaria as Ferramentas Externas (6).
+
+Como a resposta volta: O Orquestrador junta a explicação do especialista com o material encontrado, salva tudo na Memória (4) para não perder o fio da conversa e manda a resposta final direto para a tela do aluno (7).
+
+Passo a passo de uma dúvida sobre a matéria
+1- O aluno faz a pergunta: O estudante manda no chat algo como "o que é fotossíntese e o que acontece na fase clara?". O texto chega ao Orquestrador.
+
+2- O Orquestrador analisa: Ele recebe a mensagem e checa a Memória para entender o contexto (se eles já estavam falando de biologia, por exemplo). Ele percebe que é uma dúvida de conteúdo teórico.
+
+3- Passando a bola para o especialista: O Orquestrador encaminha o pedido para o Agente de dúvidas, que é quem entende de explicar matérias.
+
+4- Buscando nas apostilas: O sistema faz uma pesquisa na base de materiais (RAG) para achar os trechos exatos das apostilas da EstudaMais que falam sobre fotossíntese.
+
+5- Escrevendo a explicação: Com esses trechos em mãos, o Agente de dúvidas cria uma explicação clara e no nível certo do aluno, garantindo que o conteúdo esteja correto, e manda de volta ao Orquestrador.
+
+6- Guardando na memória: O Orquestrador recebe o texto e salva essa troca na Memória de curto prazo, para lembrar do que acabou de ser falado caso o aluno faça outra pergunta em seguida.
+
+7- Entrega no chat: A resposta final aparece na tela do aluno, explicando a dúvida direitinho.
+
+Reflexão
+O componente responsável por lembrar disso é a memória de longo prazo. Ela é necessária porque o RAG só guarda os materiais gerais das disciplinas, que são iguais para todos os alunos. Ou seja: o RAG conhece a matéria, mas não conhece o estudante. A memória de longo prazo é como a ficha individual do aluno. É ela que anota onde ele tem mais facilidade, o que ele errou na semana passada e quais temas precisa revisar. Sem essa memória, toda vez que o aluno abrisse o chat o assistente agiria como se estivesse falando com um estranho pela primeira vez, sem conseguir dar um suporte personalizado para as dificuldades dele.
